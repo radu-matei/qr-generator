@@ -10,8 +10,7 @@ public static class App
     private static readonly Dictionary<string, Func<HttpRequest, HttpResponse>> _routes = new()
     {
         { Warmup.DefaultWarmupUrl, Init},
-        { "/hello", Hello },
-        { "/qr", Qr }
+        { "/api/qr", Qr }
     };
 
     [HttpHandler]
@@ -36,23 +35,10 @@ public static class App
         };
     }
 
-    private static HttpResponse Hello(HttpRequest httpRequest)
-    {
-        return new HttpResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Headers = new Dictionary<string, string>
-            {
-                ["Content-Type"] = "text/plain"
-            },
-            BodyAsString = "Hello from C#!"
-        };
-    }
-
     private static HttpResponse Qr(HttpRequest httpRequest)
     {
         var raw = httpRequest.Body.AsBytes();
-        if (raw != null && raw.Length > 0) 
+        if (raw != null && raw.Length > 0)
         {
             var input = JsonSerializer.Deserialize<QrPayload>(raw);
             if (input != null && input.Url != null)
@@ -60,6 +46,7 @@ public static class App
                 var qr = QrCode.EncodeText(input.Url.ToLowerInvariant(), QrCode.Ecc.Medium);
                 string svg = qr.ToSvgString(4);
 
+                Console.WriteLine("Created QR code for URL {0}", input.Url);
                 return new HttpResponse
                 {
                     StatusCode = HttpStatusCode.OK,

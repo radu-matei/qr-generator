@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Generate QR Codes with Spin and Fermyon Cloud</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+
+<body>
+	<div class="container mt-5">
+		<div class="row">
+			<div class="col-6 mx-auto">
+				<form>
+					<div class="mb-3">
+						<label for="inputText" class="form-label">Enter your URL...</label>
+						<input type="text" value="https://discord.gg/AAFNfS7NGf" class="form-control" id="inputText"
+							placeholder="Enter a URL to generate a QR code for...">
+					</div>
+					<button type="submit" class="btn btn-primary" id="submitButton">QR!</button>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div id="qr" class="col-2 mx-auto">
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const button = document.querySelector('#submitButton');
+		const input = document.querySelector('#inputText');
+
+		button.addEventListener('click', function (event) {
+			event.preventDefault();
+
+			const inputValue = input.value;
+
+			fetch('/api/qr', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({Url: inputValue})
+			})
+				.then(response => response.text())
+				.then(data => {
+					document.body.insertAdjacentHTML("beforeend", data)
+
+					var svg = document.getElementsByTagName("svg")[0];
+					svg.setAttribute("width", "70%");
+				})
+				.catch(error => console.error(error));
+		});
+	</script>
+</body>
+
+</html>
